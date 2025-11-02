@@ -1,0 +1,394 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlserver"
+  url      = env("DATABASE_URL")
+}
+
+model AbonoCXC {
+  IdAbonoCXC   Int        @id(map: "PK__AbonoCXC__50CF7C72B875E334") @default(autoincrement())
+  IdMovimiento Int        @unique(map: "UQ__AbonoCXC__881A6AE1DECBBE99")
+  IdDetalleCXC Int
+  DetalleCXC   DetalleCXC @relation(fields: [IdDetalleCXC], references: [IdDetalleCXC], onUpdate: NoAction, map: "FK__AbonoCXC__IdDeta__540C7B00")
+  Movimiento   Movimiento @relation(fields: [IdMovimiento], references: [IdMovimiento], onUpdate: NoAction, map: "FK__AbonoCXC__IdMovi__531856C7")
+}
+
+model CategoriaCliente {
+  IdCategoriaCliente Int       @id(map: "PK_CategoriaCliente") @unique(map: "UQ_CategoriaCliente_IdCategoriaCliente") @default(autoincrement())
+  Nombre             String    @db.NVarChar(50)
+  Descripcion        String?   @db.NVarChar(Max)
+  FechaRegistro      DateTime  @db.DateTime
+  UsuarioRegistro    String    @db.NVarChar(50)
+  Estado             Boolean
+  Cliente            Cliente[]
+}
+
+model CategoriaProducto {
+  IdCategoriaProducto Int                @id(map: "PK_CategoriaProducto") @unique(map: "UQ_CategoriaProducto_IdCategoriaProducto") @default(autoincrement())
+  Nombre              String             @db.NVarChar(50)
+  FechaRegistro       DateTime           @db.DateTime
+  UsuarioRegistro     String             @db.NVarChar(50)
+  Estado              Boolean
+  Codigo              String?            @db.NVarChar(50)
+  SubCategoriaProd    SubCategoriaProd[]
+}
+
+model Cierre {
+  IdCierre            Int      @id(map: "PK__Cierre__7BB331EF769BFBD0") @default(autoincrement())
+  Descripcion         String?  @db.NVarChar(Max)
+  Desde               DateTime @db.DateTime
+  Hasta               DateTime @db.DateTime
+  Ventas              Decimal  @db.Decimal(11, 4)
+  IngresosAdicionales Decimal  @db.Decimal(11, 4)
+  CostoVentas         Decimal  @db.Decimal(11, 4)
+  GastosAdicionales   Decimal  @db.Decimal(11, 4)
+  UsuarioRegistro     String   @db.NVarChar(50)
+  FechaRegistro       DateTime @default(now(), map: "DF__Cierre__FechaReg__4E53A1AA") @db.DateTime
+  Estado              Boolean  @default(true, map: "DF__Cierre__Estado__4F47C5E3")
+}
+
+model Cliente {
+  IdCliente          Int              @id(map: "PK_Cliente") @unique(map: "UQ_Cliente_IdCliente") @default(autoincrement())
+  IdCategoriaCliente Int
+  Codigo             String?          @db.NVarChar(50)
+  Direccion          String?          @db.NVarChar(Max)
+  Telefono           String?          @db.NVarChar(50)
+  PersonaNatural     Boolean
+  FechaRegistro      DateTime         @db.DateTime
+  Estado             Boolean
+  UsuarioRegistro    String           @default("DBA", map: "DF__Cliente__Usuario__42E1EEFE") @db.NVarChar(50)
+  UsuarioUltMod      String?          @db.NVarChar(50)
+  FechaUltMod        DateTime?        @db.DateTime
+  IdDepartamento     Int              @default(1, map: "DF__Cliente__IdDepar__44CA3770")
+  IdMunicipio        Int?
+  Nombre             String           @default("Vacio", map: "DF__Cliente__Nombre__47A6A41B") @db.NVarChar(Max)
+  Departamento       Departamento     @relation(fields: [IdDepartamento], references: [IdDepartamento], onUpdate: NoAction, map: "FK__Cliente__IdDepar__45BE5BA9")
+  Municipio          Municipio?       @relation(fields: [IdMunicipio], references: [IdMunicipio], onDelete: NoAction, onUpdate: NoAction, map: "FK__Cliente__IdMunic__46B27FE2")
+  CategoriaCliente   CategoriaCliente @relation(fields: [IdCategoriaCliente], references: [IdCategoriaCliente], onUpdate: NoAction, map: "FK_Cliente_CategoriaCliente")
+  ClienteRuta        ClienteRuta[]
+  CXC                CXC?
+  Venta              Venta[]
+}
+
+model ClienteRuta {
+  IdClienteRuta   Int       @id(map: "PK__ClienteR__8397BD589BF30D37") @default(autoincrement())
+  IdCliente       Int
+  IdRuta          Int
+  Descripcion     String?   @db.NVarChar(Max)
+  FechaRegistro   DateTime  @default(now(), map: "DF__ClienteRu__Fecha__40F9A68C") @db.DateTime
+  FechaUltMod     DateTime? @db.DateTime
+  UsuarioRegistro String    @db.NVarChar(50)
+  UsuarioUltMod   String?   @db.NVarChar(50)
+  Estado          Boolean   @default(true, map: "DF__ClienteRu__Estad__41EDCAC5")
+  Cliente         Cliente   @relation(fields: [IdCliente], references: [IdCliente], onUpdate: NoAction, map: "FK__ClienteRu__IdCli__3F115E1A")
+  Ruta            Ruta      @relation(fields: [IdRuta], references: [IdRuta], onUpdate: NoAction, map: "FK__ClienteRu__IdRut__40058253")
+}
+
+model CoberturaRuta {
+  IdCoberturaRuta Int          @id(map: "PK__Cobertur__CF65776C705F3800") @default(autoincrement())
+  IdRuta          Int
+  IdDepartamento  Int
+  IdMunicipio     Int?
+  Observaciones   String?      @db.NVarChar(Max)
+  Departamento    Departamento @relation(fields: [IdDepartamento], references: [IdDepartamento], onUpdate: NoAction, map: "FK__Cobertura__IdDep__17036CC0")
+  Municipio       Municipio?   @relation(fields: [IdMunicipio], references: [IdMunicipio], onDelete: NoAction, onUpdate: NoAction, map: "FK__Cobertura__IdMun__17F790F9")
+  Ruta            Ruta         @relation(fields: [IdRuta], references: [IdRuta], onUpdate: NoAction, map: "FK__Cobertura__IdRut__160F4887")
+}
+
+model Compra {
+  IdCompra        Int             @id(map: "PK_Compra") @unique(map: "UQ_Compra_IdCompra") @default(autoincrement())
+  NoOrden         String?         @db.NVarChar(50)
+  IdProveedor     Int
+  Aprobada        Boolean
+  Observaciones   String?         @db.NVarChar(Max)
+  FechaRegistro   DateTime        @db.DateTime
+  UsuarioRegistro String          @db.NVarChar(50)
+  Estado          Boolean
+  Proveedor       Proveedor       @relation(fields: [IdProveedor], references: [IdProveedor], onUpdate: NoAction, map: "FK_Compra_Proveedor")
+  DetalleCompra   DetalleCompra[]
+}
+
+model ConceptoTipoMov {
+  IdConceptoTipoMov Int            @id(map: "PK__Concepto__BC26EAB48F674EBC") @default(autoincrement())
+  IdTipoMovimiento  Int
+  Codigo            String?        @db.NVarChar(50)
+  Nombre            String         @unique(map: "UQ__Concepto__75E3EFCFF5A48A17") @db.NVarChar(256)
+  Descripcion       String?        @db.NVarChar(Max)
+  FechaRegistro     DateTime       @default(now(), map: "DF__ConceptoT__Fecha__2FCF1A8A") @db.DateTime
+  FechaUltMod       DateTime?      @db.DateTime
+  UsuarioRegistro   String         @db.NVarChar(50)
+  UsuarioUltMod     String?        @db.NVarChar(50)
+  Estado            Boolean        @default(true, map: "DF__ConceptoT__Estad__30C33EC3")
+  TipoMovimiento    TipoMovimiento @relation(fields: [IdTipoMovimiento], references: [IdTipoMovimiento], onUpdate: NoAction, map: "FK__ConceptoT__IdTip__2EDAF651")
+  Movimiento        Movimiento[]
+}
+
+model CXC {
+  IdCXC           Int          @id(map: "PK_CXC") @unique(map: "UQ_CXC_IdCXC") @default(autoincrement())
+  NoCXC           String?      @db.NVarChar(50)
+  IdCliente       Int          @unique(map: "UQ_CXC_IdCliente")
+  Observaciones   String?      @db.NVarChar(Max)
+  FechaRegistro   DateTime     @db.DateTime
+  UsuarioRegistro String       @db.NVarChar(50)
+  Estado          Boolean
+  Cliente         Cliente      @relation(fields: [IdCliente], references: [IdCliente], onUpdate: NoAction, map: "FK_CXC_Cliente")
+  DetalleCXC      DetalleCXC[]
+}
+
+model Departamento {
+  IdDepartamento Int             @id(map: "PK__Departam__787A433D1985A20B") @default(autoincrement())
+  Codigo         String?         @db.NVarChar(50)
+  Nombre         String          @unique(map: "UQ__Departam__75E3EFCFA91A20EB") @db.NVarChar(256)
+  Cliente        Cliente[]
+  CoberturaRuta  CoberturaRuta[]
+  Municipio      Municipio[]
+}
+
+model DetalleCompra {
+  IdDetalleCompra Int      @id(map: "PK_DetalleCompra") @unique(map: "UQ_DetalleCompra_IdDetalleCompra") @default(autoincrement())
+  IdCompra        Int
+  IdProducto      Int
+  Cantidad        Decimal  @db.Decimal(10, 2)
+  CostoUnitario   Decimal  @db.Decimal(10, 2)
+  Observaciones   String?  @db.NVarChar(50)
+  Compra          Compra   @relation(fields: [IdCompra], references: [IdCompra], onUpdate: NoAction, map: "FK_DetalleCompra_Compra")
+  Producto        Producto @relation(fields: [IdProducto], references: [IdProducto], onUpdate: NoAction, map: "FK_DetalleCompra_Producto")
+}
+
+model DetalleCXC {
+  IdDetalleCXC    Int        @id(map: "PK_DetalleCXC") @unique(map: "UQ_DetalleCXC_IdDetalleCXC") @default(autoincrement())
+  IdCXC           Int
+  IdVenta         Int
+  Monto           Decimal    @db.Decimal(10, 2)
+  NCuotas         Int
+  DiasCredito     Int
+  Saldo           Decimal    @db.Decimal(10, 2)
+  Cancelado       Boolean
+  FechaRegistro   DateTime?  @db.DateTime
+  UsuarioRegistro String     @db.NVarChar(50)
+  Estado          Boolean
+  AbonoCXC        AbonoCXC[]
+  CXC             CXC        @relation(fields: [IdCXC], references: [IdCXC], onUpdate: NoAction, map: "FK_DetalleCXC_CXC")
+  Venta           Venta      @relation(fields: [IdVenta], references: [IdVenta], onUpdate: NoAction, map: "FK_DetalleCXC_Venta")
+}
+
+model DetalleVenta {
+  IdDetalleVenta Int      @id(map: "PK_DetalleVenta") @unique(map: "UQ_DetalleVenta_IdDetalleVenta") @default(autoincrement())
+  IdVenta        Int
+  IdProducto     Int
+  Cantidad       Decimal  @db.Decimal(10, 2)
+  PrecioUnitario Decimal  @db.Decimal(10, 2)
+  Observaciones  String?  @db.NVarChar(Max)
+  Producto       Producto @relation(fields: [IdProducto], references: [IdProducto], onUpdate: NoAction, map: "FK_DetalleVenta_Producto")
+  Venta          Venta    @relation(fields: [IdVenta], references: [IdVenta], onUpdate: NoAction, map: "FK_DetalleVenta_Venta")
+}
+
+model Modalidad {
+  IdModalidad     Int          @id(map: "PK__Modalida__6A257DAEC595C013") @default(autoincrement())
+  Codigo          String?      @db.NVarChar(50)
+  Nombre          String       @unique(map: "UQ__Modalida__75E3EFCFEDB17046") @db.NVarChar(256)
+  Descripcion     String?      @db.NVarChar(Max)
+  FechaRegistro   DateTime     @default(now(), map: "DF__Modalidad__Fecha__3493CFA7") @db.DateTime
+  FechaUltMod     DateTime?    @db.DateTime
+  UsuarioRegistro String       @db.NVarChar(50)
+  UsuarioUltMod   String?      @db.NVarChar(50)
+  Estado          Boolean      @default(true, map: "DF__Modalidad__Estad__3587F3E0")
+  Movimiento      Movimiento[]
+}
+
+model Movimiento {
+  IdMovimiento      Int              @id(map: "PK__Movimien__881A6AE08A448B58") @default(autoincrement())
+  IdTipoMovimiento  Int
+  IdConceptoTipoMov Int?
+  IdModalidad       Int
+  NumReferencia     String?          @db.NVarChar(50)
+  Monto             Decimal          @db.Decimal(11, 4)
+  FechaMovimiento   DateTime         @db.DateTime
+  Observaciones     String?          @db.NVarChar(Max)
+  FechaRegistro     DateTime         @default(now(), map: "DF__Movimient__Fecha__3B40CD36") @db.DateTime
+  FechaUltMod       DateTime?        @db.DateTime
+  UsuarioRegistro   String           @db.NVarChar(50)
+  UsuarioUltMod     String?          @db.NVarChar(50)
+  Estado            Boolean          @default(true, map: "DF__Movimient__Estad__3C34F16F")
+  AbonoCXC          AbonoCXC?
+  ConceptoTipoMov   ConceptoTipoMov? @relation(fields: [IdConceptoTipoMov], references: [IdConceptoTipoMov], onDelete: NoAction, onUpdate: NoAction, map: "FK__Movimient__IdCon__395884C4")
+  Modalidad         Modalidad        @relation(fields: [IdModalidad], references: [IdModalidad], onUpdate: NoAction, map: "FK__Movimient__IdMod__3A4CA8FD")
+  TipoMovimiento    TipoMovimiento   @relation(fields: [IdTipoMovimiento], references: [IdTipoMovimiento], onUpdate: NoAction, map: "FK__Movimient__IdTip__3864608B")
+}
+
+model Municipio {
+  IdMunicipio    Int             @id(map: "PK__Municipi__61005978B73E7814") @default(autoincrement())
+  IdDepartamento Int
+  Codigo         String?         @db.NVarChar(50)
+  Nombre         String          @unique(map: "UQ__Municipi__75E3EFCFFE027D9E") @db.NVarChar(256)
+  Cliente        Cliente[]
+  CoberturaRuta  CoberturaRuta[]
+  Departamento   Departamento    @relation(fields: [IdDepartamento], references: [IdDepartamento], onUpdate: NoAction, map: "FK__Municipio__IdDep__0E6E26BF")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model product {
+  nombre String? @db.NVarChar(255)
+  costo  Float?
+  precio Float?
+
+  @@ignore
+}
+
+model Producto {
+  IdProducto        Int                 @id(map: "PK_Producto") @unique(map: "UQ_Producto_IdProducto") @default(autoincrement())
+  IdSubCatProd      Int
+  IdUnidadMedida    Int
+  Codigo            String?             @db.NVarChar(50)
+  Precio            Decimal             @db.Decimal(10, 2)
+  Costo             Decimal             @db.Decimal(10, 2)
+  CantidadTotal     Decimal             @db.Decimal(10, 2)
+  CantidadMinima    Decimal             @db.Decimal(10, 2)
+  Imagen            Bytes?
+  Observaciones     String?             @db.NVarChar(Max)
+  TipoProducto      String?             @db.NVarChar(50)
+  FechaRegistro     DateTime            @db.DateTime
+  UsuarioRegistro   String              @db.NVarChar(50)
+  Estado            Boolean
+  Nombre            String              @default("esperando", map: "DF_Producto_Nombre") @db.NVarChar(Max)
+  DetalleCompra     DetalleCompra[]
+  DetalleVenta      DetalleVenta[]
+  SubCategoriaProd  SubCategoriaProd    @relation(fields: [IdSubCatProd], references: [IdSubCatProd], onUpdate: NoAction, map: "FK_Producto_SubCategoriaProd")
+  UnidadMedida      UnidadMedida        @relation(fields: [IdUnidadMedida], references: [IdUnidadMedida], onUpdate: NoAction, map: "FK_Producto_UnidadMedida")
+  ProveedorProducto ProveedorProducto[]
+}
+
+model Proveedor {
+  IdProveedor       Int                 @id(map: "PK_Proveedor") @unique(map: "UQ_Proveedor_IdProveedor") @default(autoincrement())
+  IdTipoProveedor   Int
+  Nombre            String              @db.NVarChar(50)
+  Departamento      String?             @db.NVarChar(50)
+  Municipio         String?             @db.NVarChar(50)
+  Direccion         String?             @db.NVarChar(Max)
+  Telefono          String?             @db.NVarChar(50)
+  FechaRegistro     DateTime            @db.DateTime
+  Estado            Boolean
+  Compra            Compra[]
+  TipoProveedor     TipoProveedor       @relation(fields: [IdTipoProveedor], references: [IdTipoProveedor], onUpdate: NoAction, map: "FK_Proveedor_TipoProveedor")
+  ProveedorProducto ProveedorProducto[]
+}
+
+model ProveedorProducto {
+  IdProveedorProducto Int       @id(map: "PK_ProveedorProducto") @unique(map: "UQ_ProveedorProducto_IdProveedorProducto") @default(autoincrement())
+  IdProveedor         Int
+  IdProducto          Int
+  Observaciones       String?   @db.NVarChar(Max)
+  Predeterminado      Boolean
+  FechaRegistro       DateTime  @db.DateTime
+  UsuarioRegistro     BigInt
+  Estado              Boolean
+  Producto            Producto  @relation(fields: [IdProducto], references: [IdProducto], onUpdate: NoAction, map: "FK_ProveedorProducto_Producto")
+  Proveedor           Proveedor @relation(fields: [IdProveedor], references: [IdProveedor], onUpdate: NoAction, map: "FK_ProveedorProducto_Proveedor")
+}
+
+model Ruta {
+  IdRuta          Int             @id(map: "PK__Ruta__887538FE7552EAF5") @default(autoincrement())
+  Codigo          String?         @db.NVarChar(50)
+  Nombre          String          @unique(map: "UQ__Ruta__75E3EFCF9216B9E5") @db.NVarChar(50)
+  Descripcion     String?         @db.NVarChar(Max)
+  Gestor          String          @db.NVarChar(Max)
+  FechaRegistro   DateTime        @default(now(), map: "DF__Ruta__FechaRegis__123EB7A3") @db.DateTime
+  FechaUltMod     DateTime?       @db.DateTime
+  UsuarioRegistro String          @db.NVarChar(50)
+  UsuarioUltMod   String?         @db.NVarChar(50)
+  Estado          Boolean         @default(true, map: "DF__Ruta__Estado__1332DBDC")
+  ClienteRuta     ClienteRuta[]
+  CoberturaRuta   CoberturaRuta[]
+}
+
+model SubCategoriaProd {
+  IdSubCatProd        Int               @id(map: "PK_SubCategoriaProd") @unique(map: "UQ_SubCategoriaProd_IdSubCatProd") @default(autoincrement())
+  IdCategoriaProducto Int
+  Nombre              String            @db.NVarChar(50)
+  FechaRegistro       DateTime          @db.DateTime
+  UsuarioRegistro     String            @db.NVarChar(50)
+  Estado              Boolean
+  Codigo              String?           @db.NVarChar(50)
+  Producto            Producto[]
+  CategoriaProducto   CategoriaProducto @relation(fields: [IdCategoriaProducto], references: [IdCategoriaProducto], onUpdate: NoAction, map: "FK_SubCategoriaProd_CategoriaProducto")
+}
+
+model sysdiagrams {
+  name         String @db.NVarChar(128)
+  principal_id Int
+  diagram_id   Int    @id(map: "PK__sysdiagr__C2B05B61FF0B39E4") @default(autoincrement())
+  version      Int?
+  definition   Bytes?
+
+  @@unique([principal_id, name], map: "UK_principal_name")
+}
+
+model TipoMovimiento {
+  IdTipoMovimiento Int               @id(map: "PK__TipoMovi__820D7FC2D41BDC93") @default(autoincrement())
+  Codigo           String?           @db.NVarChar(50)
+  Nombre           String            @unique(map: "UQ__TipoMovi__75E3EFCF6BCC46F8") @db.NVarChar(256)
+  Descripcion      String?           @db.NVarChar(Max)
+  FechaRegistro    DateTime          @default(now(), map: "DF__TipoMovim__Fecha__2A164134") @db.DateTime
+  FechaUltMod      DateTime?         @db.DateTime
+  UsuarioRegistro  String            @db.NVarChar(50)
+  UsuarioUltMod    String?           @db.NVarChar(50)
+  Estado           Boolean           @default(true, map: "DF__TipoMovim__Estad__2B0A656D")
+  ConceptoTipoMov  ConceptoTipoMov[]
+  Movimiento       Movimiento[]
+}
+
+model TipoProveedor {
+  IdTipoProveedor Int         @id(map: "PK_TipoProveedor") @unique(map: "UQ_TipoProveedor_IdTipoProveedor") @default(autoincrement())
+  Nombre          String      @db.NVarChar(50)
+  Observaciones   String?     @db.NVarChar(Max)
+  FechaRegistro   DateTime    @db.DateTime
+  UsuarioRegistro String      @db.NVarChar(50)
+  Estado          Boolean
+  Proveedor       Proveedor[]
+}
+
+model TipoVenta {
+  IdTipoVenta     Int       @id(map: "PK__TipoVent__191D80C09FF7EECB") @default(autoincrement())
+  Codigo          String?   @db.NVarChar(50)
+  Nombre          String    @unique(map: "UQ__TipoVent__75E3EFCF127AF19C") @db.NVarChar(50)
+  Descripcion     String?   @db.NVarChar(Max)
+  FechaRegistro   DateTime  @default(now(), map: "DF__TipoVenta__Fecha__04E4BC85") @db.DateTime
+  FechaUltMod     DateTime? @db.DateTime
+  UsuarioRegistro String    @db.NVarChar(50)
+  UsuarioUltMod   String?   @db.NVarChar(50)
+  Estado          Boolean   @default(true, map: "DF__TipoVenta__Estad__05D8E0BE")
+  Venta           Venta[]
+}
+
+model UnidadMedida {
+  IdUnidadMedida  Int        @id(map: "PK_UnidadMedida") @unique(map: "UQ_UnidadMedida_IdUnidadMedida") @default(autoincrement())
+  Abreviatura     String?    @db.NVarChar(50)
+  Nombre          String     @db.NVarChar(50)
+  FechaRegistro   DateTime   @db.DateTime
+  UsuarioRegistro String     @db.NVarChar(50)
+  Estado          Boolean
+  Producto        Producto[]
+}
+
+model Venta {
+  IdVenta         Int            @id(map: "PK_Venta") @unique(map: "UQ_Venta_IdVenta") @default(autoincrement())
+  NoVenta         String?        @db.NVarChar(50)
+  IdCliente       Int
+  Credito         Boolean
+  Observaciones   String?        @db.NVarChar(Max)
+  EnviarA         String?        @db.NVarChar(Max)
+  FechaRegistro   DateTime       @db.DateTime
+  UsuarioRegistro String         @db.NVarChar(50)
+  Estado          Boolean
+  Ubicacion       String?        @db.NVarChar(Max)
+  IdTipoVenta     Int            @default(1, map: "DF__Venta__IdTipoVen__06CD04F7")
+  FechaEntrega    DateTime?      @db.DateTime
+  FechaRecepcion  DateTime?      @db.DateTime
+  WAMID           String?        @db.NVarChar(Max)
+  DetalleCXC      DetalleCXC[]
+  DetalleVenta    DetalleVenta[]
+  TipoVenta       TipoVenta      @relation(fields: [IdTipoVenta], references: [IdTipoVenta], onUpdate: NoAction, map: "FK__Venta__IdTipoVen__07C12930")
+  Cliente         Cliente        @relation(fields: [IdCliente], references: [IdCliente], onUpdate: NoAction, map: "FK_Venta_Cliente")
+}
