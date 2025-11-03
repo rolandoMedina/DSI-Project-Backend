@@ -1,3 +1,5 @@
+/* eslint-disable prettier/prettier */
+
 import { defineConfig, env } from "prisma/config";
 
 export default defineConfig({
