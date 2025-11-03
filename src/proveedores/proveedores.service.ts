@@ -9,7 +9,13 @@ export class ProveedoresService {
   }
 
   create(createProveedoreDto: CreateProveedoreDto) {
-    return 'This action adds a new proveedore';
+    return this.prisma.proveedor.create({
+      data: {
+        ...createProveedoreDto,
+        FechaRegistro: new Date(),
+        Estado: true,
+      },
+    });
   }
 
   findAll() {
@@ -17,14 +23,10 @@ export class ProveedoresService {
   }
 
   findOne(id: number) {
-    return `This action returns a #${id} proveedore`;
+    return this.prisma.proveedor.findUnique({ where: { IdProveedor: id } })
   }
 
   update(id: number, updateProveedoreDto: UpdateProveedoreDto) {
-    return `This action updates a #${id} proveedore`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} proveedore`;
+    return this.prisma.proveedor.update({ where: { IdProveedor: id }, data: updateProveedoreDto });
   }
 }
