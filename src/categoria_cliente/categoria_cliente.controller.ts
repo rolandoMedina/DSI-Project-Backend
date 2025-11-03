@@ -26,9 +26,4 @@ export class CategoriaClienteController {
   update(@Param('id') id: string, @Body() updateCategoriaClienteDto: UpdateCategoriaClienteDto) {
     return this.categoriaClienteService.update(+id, updateCategoriaClienteDto);
   }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.categoriaClienteService.remove(+id);
-  }
 }
