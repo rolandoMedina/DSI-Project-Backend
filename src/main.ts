@@ -23,6 +23,13 @@ async function bootstrap() {
     transform: true,
   }));
 
+  app.enableCors({
+    origin: true,        // Acepta cualquier origen
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+    allowedHeaders: '*', // Acepta cualquier encabezado
+    credentials: true,   // Opcional: permite cookies/autenticación
+  });
+
   await app.listen(process.env.PORT ?? 3000);
 }
 bootstrap();
