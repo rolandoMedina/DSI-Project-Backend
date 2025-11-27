@@ -109,6 +109,12 @@ model Compra {
   Proveedor       Proveedor       @relation(fields: [IdProveedor], references: [IdProveedor], onUpdate: NoAction, map: "FK_Compra_Proveedor")
   DetalleCompra   DetalleCompra[]
 }
+model Rol {
+  IdRol      Int      @id @default(autoincrement())
+  Nombre     String   @db.NVarChar(50)
+  Estado     Boolean  @default(true)
+  FechaReg   DateTime @default(now()) @db.DateTime
+}
 
 model ConceptoTipoMov {
   IdConceptoTipoMov Int            @id(map: "PK__Concepto__BC26EAB48F674EBC") @default(autoincrement())
