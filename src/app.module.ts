@@ -7,7 +7,6 @@ import { ProveedoresModule } from './proveedores/proveedores.module';
 import { CategoriaClienteModule } from './categoria_cliente/categoria_cliente.module';
 import { ClienteModule } from './cliente/cliente.module';
 import { CompraModule } from './compra/compra.module';
-import { RolModule } from './rol/rol.module';
 import { TipoMovimientoModule } from './tipo_movimiento/tipo_movimiento.module';
 import { ProductosModule } from './productos/productos.module';
 import { SubCatsProductoModule } from './sub_cats_producto/sub_cats_producto.module';
@@ -16,7 +15,7 @@ import { TipoVentaModule } from './tipo_venta/tipo_venta.module';
 import { UnidadMedidaModule } from './unidad_medida/unidad_medida.module';
 
 @Module({
-  imports: [PrismaModule, ProveedoresModule, CategoriaClienteModule, TipoMovimientoModule, ProductosModule, SubCatsProductoModule, ClienteModule, CompraModule, RolModule, TipoProveedorModule, TipoVentaModule, UnidadMedidaModule],
+  imports: [PrismaModule, ProveedoresModule, CategoriaClienteModule, TipoMovimientoModule, ProductosModule, SubCatsProductoModule, ClienteModule, CompraModule, TipoProveedorModule, TipoVentaModule, UnidadMedidaModule],
   controllers: [AppController],
   providers: [AppService],
 })
