@@ -7,9 +7,12 @@ import { CategoriaClienteModule } from './categoria_cliente/categoria_cliente.mo
 import { ClienteModule } from './cliente/cliente.module';
 import { CompraModule } from './compra/compra.module';
 import { RolModule } from './rol/rol.module';
+import { TipoMovimientoModule } from './tipo_movimiento/tipo_movimiento.module';
+import { ProductosModule } from './productos/productos.module';
+import { SubCatsProductoModule } from './sub_cats_producto/sub_cats_producto.module';
 
 @Module({
-  imports: [PrismaModule, ProveedoresModule, CategoriaClienteModule, ClienteModule, CompraModule, RolModule],
+  imports: [PrismaModule, ProveedoresModule, CategoriaClienteModule, TipoMovimientoModule, ProductosModule, SubCatsProductoModule, ClienteModule, CompraModule, RolModule],
   controllers: [AppController],
   providers: [AppService],
 })
