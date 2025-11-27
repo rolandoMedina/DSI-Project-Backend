@@ -7,6 +7,6 @@ export default defineConfig({
   },
   engine: "classic",
   datasource: {
-    url:"sqlserver://89.117.72.48:1433;database=Tokes;user=dsi;password=dsi2025;encrypt=true;trustServerCertificate=true;",
+    url:"sqlserver://127.0.0.1:1433;database=DSI_PROYECT;user=sa;password=123abc;encrypt=true;trustServerCertificate=true;",
   },
 });
