@@ -1,5 +1,3 @@
-/* eslint-disable prettier/prettier */
-
 import { defineConfig, env } from "prisma/config";
 
 export default defineConfig({
@@ -9,6 +7,6 @@ export default defineConfig({
   },
   engine: "classic",
   datasource: {
-    url: env("DATABASE_URL"),
+    url:"sqlserver://192.168.0.93:1433;database=Tokes;user=sa;password=Empro.2025;encrypt=true;trustServerCertificate=true;",
   },
 });
